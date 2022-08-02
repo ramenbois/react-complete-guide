@@ -1,29 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 
 import Button from "../UI/Button";
 import Card from "../UI/Card";
 import ErrorModal from "../UI/ErrorModal";
+import Wrapper from "../Helpers/Wrapper";
 import classes from "./AddUser.module.css";
 
 const AddUser = (props) => {
-  const [enteredUsername, setEnteredUsername] = useState("");
-  const [enteredAge, setEnteredAge] = useState("");
+  const inputNameRef = useRef();
+  const inputAgeRef = useRef();
   const [error, setError] = useState();
-
-  const usernameChangeHandler = (event) => {
-    setEnteredUsername(event.target.value);
-  };
-
-  const ageChangeHandler = (event) => {
-    setEnteredAge(event.target.value);
-  };
 
   const addUserHandler = (event) => {
     event.preventDefault();
+    console.log(inputNameRef.current.value);
+    console.log(inputNameRef.current.value.length);
+    console.log(inputAgeRef.current.value);
+    const enteredName = inputNameRef.current.value;
+    const enteredUserAge = inputAgeRef.current.value;
 
-    if (enteredUsername.trim().length === 0 || enteredAge.trim().length === 0) {
+    if (enteredName.trim().length === 0 || enteredUserAge.trim().length === 0) {
       setError({
-        title: "Invalid values",
+        title: "Invalid input",
         message: "Please enter valid name and age (non-empty values)",
       });
       return;
@@ -31,7 +29,7 @@ const AddUser = (props) => {
 
     // + symbol mean force converstion to number
     // Because enterdAge basically a String
-    if (+enteredAge < 1) {
+    if (+enteredUserAge < 1) {
       setError({
         title: "Invalid age",
         message: "Please enter valid age (>0)",
@@ -39,10 +37,11 @@ const AddUser = (props) => {
       return;
     }
 
-    props.onAddUser(enteredUsername, enteredAge);
+    props.onAddUser(enteredName, enteredUserAge);
 
-    setEnteredUsername("");
-    setEnteredAge("");
+    // Reset input form into empty value
+    inputNameRef.current.value = "";
+    inputAgeRef.current.value = "";
   };
 
   const errorHandler = () => {
@@ -50,7 +49,14 @@ const AddUser = (props) => {
   };
 
   return (
-    <div>
+    // Use alternative React Fragment
+    // 1. Use React.Fragment
+    // <React.Fragment></React.Fragment>
+    // 2. Use Fragment (import Fragment first)
+    // <Fragment></Fragment>
+    // 3. Use empty wrapper
+    // <></>
+    <Wrapper>
       {error && (
         <ErrorModal
           title={error.title}
@@ -60,24 +66,14 @@ const AddUser = (props) => {
       )}
       <Card className={classes.input}>
         <form onSubmit={addUserHandler}>
-          <label htmlFor='username'>Username</label>
-          <input
-            id='username'
-            type='text'
-            value={enteredUsername}
-            onChange={usernameChangeHandler}
-          />
-          <label htmlFor='age'>Age (Years)</label>
-          <input
-            id='age'
-            type='text'
-            value={enteredAge}
-            onChange={ageChangeHandler}
-          />
-          <Button type='submit'>Add User</Button>
+          <label htmlFor="username">Username</label>
+          <input id="username" type="text" ref={inputNameRef} />
+          <label htmlFor="age">Age (Years)</label>
+          <input id="age" type="number" ref={inputAgeRef} />
+          <Button type="submit">Add User</Button>
         </form>
       </Card>
-    </div>
+    </Wrapper>
   );
 };
 
